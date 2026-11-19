@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/tugas.dart';
 import '../widgets/kartu_tugas.dart';
+import 'daftar_form_screen.dart';
 
 class DaftarTugasScreen extends StatefulWidget {
   const DaftarTugasScreen({super.key});
@@ -64,6 +65,22 @@ class _DaftarTugasScreenState extends State<DaftarTugasScreen> {
     );
   }
 
+  void _pesan(String teks) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(teks)));
+  }
+
+  Future<void> _tambahTugas() async {
+    final hasil = await Navigator.push<Tugas>(
+      context,
+      MaterialPageRoute(builder: (_) => const FormTugasScreen()),
+    );
+    if (!mounted || hasil == null) return;
+    setState(() {
+      _daftarTugas.add(hasil);
+    });
+    _pesan('Tugas berhasil ditambahkan');
+  }
+
   @override
   Widget build(BuildContext context) {
     final total = _daftarTugas.length;
@@ -111,6 +128,11 @@ class _DaftarTugasScreenState extends State<DaftarTugasScreen> {
                   ),
           ),
         ],
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: _tambahTugas,
+        icon: const Icon(Icons.add),
+        label: const Text('Tambah'),
       ),
     );
   }
