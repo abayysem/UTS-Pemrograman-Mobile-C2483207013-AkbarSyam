@@ -27,7 +27,6 @@ class DetailTugasScreen extends StatelessWidget {
     );
   }
 
-  @override
   Future<void> _ubah(BuildContext context) async {
     final hasil = await Navigator.push<Tugas>(
       context,
@@ -38,6 +37,30 @@ class DetailTugasScreen extends StatelessWidget {
     }
   }
 
+  Future<void> _konfirmasiHapus(BuildContext context) async {
+    final yakin = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Hapus Tugas'),
+        content: Text('Yakin ingin menghapus "${tugas.judul}"?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Batal'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('Hapus'),
+          ),
+        ],
+      ),
+    );
+    if (yakin == true && context.mounted) {
+      Navigator.pop(context, {'aksi': 'hapus', 'id': tugas.id});
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -61,7 +84,7 @@ class DetailTugasScreen extends StatelessWidget {
               children: [
                 Expanded(
                   child: FilledButton.icon(
-                    onPressed: () => _ubah(context), // diisi pada tahap 9
+                    onPressed: () => _ubah(context),
                     icon: const Icon(Icons.edit),
                     label: const Text('Ubah'),
                   ),
@@ -70,7 +93,7 @@ class DetailTugasScreen extends StatelessWidget {
                 Expanded(
                   child: FilledButton.icon(
                     style: FilledButton.styleFrom(backgroundColor: Colors.red),
-                    onPressed: () {}, // diisi pada tahap 10
+                    onPressed: () => _konfirmasiHapus(context),
                     icon: const Icon(Icons.delete),
                     label: const Text('Hapus'),
                   ),

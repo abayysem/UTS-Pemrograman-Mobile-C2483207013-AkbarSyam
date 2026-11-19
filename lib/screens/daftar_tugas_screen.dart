@@ -98,6 +98,14 @@ class _DaftarTugasScreenState extends State<DaftarTugasScreen> {
         });
         _pesan('Tugas berhasil diperbarui');
       }
+    } else if (hasil['aksi'] == 'hapus') {
+      final index = _daftarTugas.indexWhere((t) => t.id == hasil['id']);
+      if (index != -1) {
+        setState(() {
+          _daftarTugas.removeAt(index);
+        });
+        _pesan('Tugas berhasil dihapus');
+      }
     }
   }
 
