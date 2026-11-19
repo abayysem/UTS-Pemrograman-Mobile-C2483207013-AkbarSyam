@@ -99,7 +99,8 @@ flutter pub get
 ```
 ### 4. Jalankan Aplikasi
 ```bash
-flutter run```
+flutter run
+```
 
 Pastikan Flutter SDK dan perangkat Android atau emulator sudah tersedia.
 
