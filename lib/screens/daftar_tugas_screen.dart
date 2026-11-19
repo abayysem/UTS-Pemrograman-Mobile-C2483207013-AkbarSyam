@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/tugas.dart';
+import '../widgets/kartu_tugas.dart';
 
 class DaftarTugasScreen extends StatefulWidget {
   const DaftarTugasScreen({super.key});
@@ -37,23 +38,79 @@ class _DaftarTugasScreenState extends State<DaftarTugasScreen> {
     ),
   ];
 
+  Widget _kotakRingkasan(String label, int jumlah, Color warna) {
+    return Expanded(
+      child: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 4),
+        padding: const EdgeInsets.symmetric(vertical: 12),
+        decoration: BoxDecoration(
+          color: warna.withValues(alpha: 0.15),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Column(
+          children: [
+            Text(
+              '$jumlah',
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: warna,
+              ),
+            ),
+            Text(label),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    final total = _daftarTugas.length;
+    final selesai = _daftarTugas.where((t) => t.selesai).length;
+    final belum = total - selesai;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('TugasKu'),
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
       ),
-      body: ListView.builder(
-        itemCount: _daftarTugas.length,
-        itemBuilder: (context, index) {
-          final tugas = _daftarTugas[index];
-          return ListTile(
-            title: Text(tugas.judul),
-            subtitle: Text('${tugas.mataKuliah} • ${tugas.tenggat}'),
-            trailing: Text(tugas.prioritas),
-          );
-        },
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(12),
+            child: Row(
+              children: [
+                _kotakRingkasan('Total', total, Colors.indigo),
+                _kotakRingkasan('Selesai', selesai, Colors.green),
+                _kotakRingkasan('Belum', belum, Colors.orange),
+              ],
+            ),
+          ),
+          Expanded(
+            child: _daftarTugas.isEmpty
+                ? const Center(
+                    child: Padding(
+                      padding: EdgeInsets.all(24),
+                      child: Text(
+                        'Belum ada tugas.\nTekan tombol + untuk menambah tugas.',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(fontSize: 16, color: Colors.grey),
+                      ),
+                    ),
+                  )
+                : ListView.builder(
+                    itemCount: _daftarTugas.length,
+                    itemBuilder: (context, index) {
+                      final tugas = _daftarTugas[index];
+                      return KartuTugas(
+                        tugas: tugas,
+                        onTap: () {}, // diisi pada tahap 8
+                      );
+                    },
+                  ),
+          ),
+        ],
       ),
     );
   }
