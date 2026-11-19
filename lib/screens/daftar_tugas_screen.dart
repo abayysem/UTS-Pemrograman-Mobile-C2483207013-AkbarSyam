@@ -82,11 +82,23 @@ class _DaftarTugasScreenState extends State<DaftarTugasScreen> {
     _pesan('Tugas berhasil ditambahkan');
   }
 
-  void _bukaDetail(Tugas tugas) {
-    Navigator.push(
+  Future<void> _bukaDetail(Tugas tugas) async {
+    final hasil = await Navigator.push<Map<String, dynamic>>(
       context,
       MaterialPageRoute(builder: (_) => DetailTugasScreen(tugas: tugas)),
     );
+    if (!mounted || hasil == null) return;
+
+    if (hasil['aksi'] == 'ubah') {
+      final tugasBaru = hasil['tugas'] as Tugas;
+      final index = _daftarTugas.indexWhere((t) => t.id == tugasBaru.id);
+      if (index != -1) {
+        setState(() {
+          _daftarTugas[index] = tugasBaru;
+        });
+        _pesan('Tugas berhasil diperbarui');
+      }
+    }
   }
 
   @override

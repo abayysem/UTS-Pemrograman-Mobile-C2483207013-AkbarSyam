@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import '../models/tugas.dart';
 
 class FormTugasScreen extends StatefulWidget {
-  const FormTugasScreen({super.key});
+  final Tugas? tugas; // null = mode tambah, ada isi = mode ubah
+
+  const FormTugasScreen({super.key, this.tugas});
 
   @override
   State<FormTugasScreen> createState() => _FormTugasScreenState();
@@ -16,6 +18,24 @@ class _FormTugasScreenState extends State<FormTugasScreen> {
   final _tenggatController = TextEditingController();
 
   String? _prioritas;
+  bool _selesai = false;
+
+  bool get _modeUbah => widget.tugas != null;
+
+  @override
+  void initState() {
+    super.initState();
+    // Mode ubah: form diisi otomatis dengan data lama
+    final t = widget.tugas;
+    if (t != null) {
+      _judulController.text = t.judul;
+      _mataKuliahController.text = t.mataKuliah;
+      _deskripsiController.text = t.deskripsi;
+      _tenggatController.text = t.tenggat;
+      _prioritas = t.prioritas;
+      _selesai = t.selesai;
+    }
+  }
 
   @override
   void dispose() {
@@ -26,24 +46,27 @@ class _FormTugasScreenState extends State<FormTugasScreen> {
     super.dispose();
   }
 
-  // validasi
+  // V-01
   String? _validasiJudul(String? v) {
     if (v == null || v.trim().isEmpty) return 'Judul tidak boleh kosong';
     if (v.trim().length < 3) return 'Judul minimal 3 karakter';
     return null;
   }
 
+  // V-02
   String? _validasiMataKuliah(String? v) {
     if (v == null || v.trim().isEmpty) return 'Mata kuliah tidak boleh kosong';
     return null;
   }
 
+  // V-03
   String? _validasiDeskripsi(String? v) {
     if (v == null || v.trim().isEmpty) return 'Deskripsi tidak boleh kosong';
     if (v.trim().length < 10) return 'Deskripsi minimal 10 karakter';
     return null;
   }
 
+  // V-04
   String? _validasiTenggat(String? v) {
     if (v == null || v.trim().isEmpty) return 'Tenggat tidak boleh kosong';
     final teks = v.trim();
@@ -66,6 +89,7 @@ class _FormTugasScreenState extends State<FormTugasScreen> {
     return null;
   }
 
+  // V-05
   String? _validasiPrioritas(String? v) {
     if (v == null || v.isEmpty) return 'Prioritas wajib dipilih';
     return null;
@@ -74,14 +98,17 @@ class _FormTugasScreenState extends State<FormTugasScreen> {
   void _simpan() {
     if (_formKey.currentState!.validate()) {
       final hasil = Tugas(
-        id: DateTime.now().millisecondsSinceEpoch.toString(),
+        id:
+            widget.tugas?.id ??
+            DateTime.now().millisecondsSinceEpoch.toString(),
         judul: _judulController.text.trim(),
         mataKuliah: _mataKuliahController.text.trim(),
         deskripsi: _deskripsiController.text.trim(),
         tenggat: _tenggatController.text.trim(),
         prioritas: _prioritas!,
+        selesai: _modeUbah ? _selesai : false,
       );
-      Navigator.pop(context, hasil);
+      Navigator.pop(context, hasil); // kirim hasil ke halaman sebelumnya
     }
   }
 
@@ -89,7 +116,7 @@ class _FormTugasScreenState extends State<FormTugasScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Tambah Tugas'),
+        title: Text(_modeUbah ? 'Ubah Tugas' : 'Tambah Tugas'),
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
       ),
       body: SingleChildScrollView(
@@ -149,6 +176,14 @@ class _FormTugasScreenState extends State<FormTugasScreen> {
                 onChanged: (v) => setState(() => _prioritas = v),
                 validator: _validasiPrioritas,
               ),
+              if (_modeUbah) ...[
+                const SizedBox(height: 8),
+                SwitchListTile(
+                  title: const Text('Tugas sudah selesai'),
+                  value: _selesai,
+                  onChanged: (v) => setState(() => _selesai = v),
+                ),
+              ],
               const SizedBox(height: 24),
               SizedBox(
                 width: double.infinity,

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/tugas.dart';
+import 'daftar_form_screen.dart';
 
 class DetailTugasScreen extends StatelessWidget {
   final Tugas tugas;
@@ -27,6 +28,16 @@ class DetailTugasScreen extends StatelessWidget {
   }
 
   @override
+  Future<void> _ubah(BuildContext context) async {
+    final hasil = await Navigator.push<Tugas>(
+      context,
+      MaterialPageRoute(builder: (_) => FormTugasScreen(tugas: tugas)),
+    );
+    if (hasil != null && context.mounted) {
+      Navigator.pop(context, {'aksi': 'ubah', 'tugas': hasil});
+    }
+  }
+
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -50,7 +61,7 @@ class DetailTugasScreen extends StatelessWidget {
               children: [
                 Expanded(
                   child: FilledButton.icon(
-                    onPressed: () {}, // diisi pada tahap 9
+                    onPressed: () => _ubah(context), // diisi pada tahap 9
                     icon: const Icon(Icons.edit),
                     label: const Text('Ubah'),
                   ),
