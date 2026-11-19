@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../models/tugas.dart';
 import '../widgets/kartu_tugas.dart';
 import 'daftar_form_screen.dart';
+import 'detail_tugas_screen.dart';
 
 class DaftarTugasScreen extends StatefulWidget {
   const DaftarTugasScreen({super.key});
@@ -81,6 +82,13 @@ class _DaftarTugasScreenState extends State<DaftarTugasScreen> {
     _pesan('Tugas berhasil ditambahkan');
   }
 
+  void _bukaDetail(Tugas tugas) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => DetailTugasScreen(tugas: tugas)),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final total = _daftarTugas.length;
@@ -122,7 +130,7 @@ class _DaftarTugasScreenState extends State<DaftarTugasScreen> {
                       final tugas = _daftarTugas[index];
                       return KartuTugas(
                         tugas: tugas,
-                        onTap: () {}, // diisi pada tahap 8
+                        onTap: () => _bukaDetail(tugas), // diisi pada tahap 8
                       );
                     },
                   ),
