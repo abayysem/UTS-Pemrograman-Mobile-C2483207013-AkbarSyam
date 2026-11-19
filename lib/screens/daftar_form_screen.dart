@@ -26,16 +26,63 @@ class _FormTugasScreenState extends State<FormTugasScreen> {
     super.dispose();
   }
 
+  // validasi
+  String? _validasiJudul(String? v) {
+    if (v == null || v.trim().isEmpty) return 'Judul tidak boleh kosong';
+    if (v.trim().length < 3) return 'Judul minimal 3 karakter';
+    return null;
+  }
+
+  String? _validasiMataKuliah(String? v) {
+    if (v == null || v.trim().isEmpty) return 'Mata kuliah tidak boleh kosong';
+    return null;
+  }
+
+  String? _validasiDeskripsi(String? v) {
+    if (v == null || v.trim().isEmpty) return 'Deskripsi tidak boleh kosong';
+    if (v.trim().length < 10) return 'Deskripsi minimal 10 karakter';
+    return null;
+  }
+
+  String? _validasiTenggat(String? v) {
+    if (v == null || v.trim().isEmpty) return 'Tenggat tidak boleh kosong';
+    final teks = v.trim();
+    if (!RegExp(r'^\d{2}-\d{2}-\d{4}$').hasMatch(teks)) {
+      return 'Format harus DD-MM-YYYY';
+    }
+    final bagian = teks.split('-');
+    final hari = int.parse(bagian[0]);
+    final bulan = int.parse(bagian[1]);
+    final tahun = int.parse(bagian[2]);
+
+    // DateTime menggeser tanggal tidak nyata (31-02 menjadi 03-03),
+    // jadi hasilnya dibandingkan lagi dengan input asli.
+    final tanggal = DateTime(tahun, bulan, hari);
+    if (tanggal.day != hari ||
+        tanggal.month != bulan ||
+        tanggal.year != tahun) {
+      return 'Tanggal tidak nyata (mis. 31-02-2026)';
+    }
+    return null;
+  }
+
+  String? _validasiPrioritas(String? v) {
+    if (v == null || v.isEmpty) return 'Prioritas wajib dipilih';
+    return null;
+  }
+
   void _simpan() {
-    final hasil = Tugas(
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
-      judul: _judulController.text.trim(),
-      mataKuliah: _mataKuliahController.text.trim(),
-      deskripsi: _deskripsiController.text.trim(),
-      tenggat: _tenggatController.text.trim(),
-      prioritas: _prioritas ?? 'Rendah',
-    );
-    Navigator.pop(context, hasil);
+    if (_formKey.currentState!.validate()) {
+      final hasil = Tugas(
+        id: DateTime.now().millisecondsSinceEpoch.toString(),
+        judul: _judulController.text.trim(),
+        mataKuliah: _mataKuliahController.text.trim(),
+        deskripsi: _deskripsiController.text.trim(),
+        tenggat: _tenggatController.text.trim(),
+        prioritas: _prioritas!,
+      );
+      Navigator.pop(context, hasil);
+    }
   }
 
   @override
@@ -57,6 +104,7 @@ class _FormTugasScreenState extends State<FormTugasScreen> {
                   labelText: 'Judul Tugas',
                   border: OutlineInputBorder(),
                 ),
+                validator: _validasiJudul,
               ),
               const SizedBox(height: 16),
               TextFormField(
@@ -65,6 +113,7 @@ class _FormTugasScreenState extends State<FormTugasScreen> {
                   labelText: 'Mata Kuliah',
                   border: OutlineInputBorder(),
                 ),
+                validator: _validasiMataKuliah,
               ),
               const SizedBox(height: 16),
               TextFormField(
@@ -74,6 +123,7 @@ class _FormTugasScreenState extends State<FormTugasScreen> {
                   labelText: 'Deskripsi',
                   border: OutlineInputBorder(),
                 ),
+                validator: _validasiDeskripsi,
               ),
               const SizedBox(height: 16),
               TextFormField(
@@ -84,6 +134,7 @@ class _FormTugasScreenState extends State<FormTugasScreen> {
                   hintText: 'contoh: 25-11-2026',
                   border: OutlineInputBorder(),
                 ),
+                validator: _validasiTenggat,
               ),
               const SizedBox(height: 16),
               DropdownButtonFormField<String>(
@@ -96,6 +147,7 @@ class _FormTugasScreenState extends State<FormTugasScreen> {
                     .map((p) => DropdownMenuItem(value: p, child: Text(p)))
                     .toList(),
                 onChanged: (v) => setState(() => _prioritas = v),
+                validator: _validasiPrioritas,
               ),
               const SizedBox(height: 24),
               SizedBox(
